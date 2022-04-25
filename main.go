@@ -1,11 +1,14 @@
 package main
 
 import (
-	"atmcase/atm"
 	"fmt"
 )
 
 func main() {
 	fmt.Println("Selamat Datang !")
-	atm.StartApp()
+	StartApp()
+}
+
+func StartApp() {
+	fmt.Println("Silahakan Login:")
 }
