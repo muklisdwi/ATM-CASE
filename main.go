@@ -105,7 +105,7 @@ func OptionAccount(account *AccountBank) {
 		case "1":
 			tarikUang(account)
 		case "2":
-			setorUang()
+			setorUang(account)
 		case "3":
 			transferUang()
 		case "4":
@@ -159,7 +159,7 @@ func tarikUang(account *AccountBank) {
 				fmt.Printf("\n[1] Ya / [0] Tidak : ")
 				opsi, _ := InputScan()
 				if opsi == "1" {
-					fmt.Println("Proses Tarik")
+					fmt.Println("\n>>>>> Penarikan diproses <<<<")
 					result := account.Balance.Sub(decimal.NewFromInt(int64(tarik)))
 					account.Balance = result
 					account.History = append(account.History, HistoryTransaction{
@@ -181,8 +181,30 @@ func tarikUang(account *AccountBank) {
 }
 
 // fungsi untuk proses setor uang
-func setorUang() {
-	fmt.Println("Setor Uang")
+func setorUang(account *AccountBank) {
+	fmt.Println("\nSetor Uang :")
+	fmt.Println("Setor hanya menerima kelipatan 50000")
+	fmt.Printf("\nMasukan jumlah nominal : ")
+	nominal, _ := InputScan()
+	setor, err := decimal.NewFromString(nominal)
+	if err != nil {
+		fmt.Println("\n>>>>>> Masukan Salah ! <<<<<<")
+		return
+	}
+	if setor.Mod(decimal.NewFromInt(int64(50000))).Equal(decimal.NewFromInt32(0)) {
+		fmt.Println("\n>>>>>> Setoran diproses <<<<<")
+		result := setor.Add(account.Balance)
+		account.Balance = result
+		account.History = append(account.History, HistoryTransaction{
+			Date:        TimeDateNow(),
+			Transaction: "Setor",
+			Amount:      setor,
+			Balance:     result,
+		})
+	} else {
+		fmt.Println("\n>>>>>> Nominal Salah ! <<<<<<")
+		return
+	}
 }
 
 // proses transfer uang
@@ -202,7 +224,7 @@ func riwayatTransaksi(account *AccountBank) {
 
 // fungsi untuk validasi saldo
 func validasiSaldo(saldo *AccountBank, tarik int) bool {
-	return saldo.Balance.GreaterThan(decimal.NewFromInt(int64(tarik)))
+	return saldo.Balance.GreaterThanOrEqual(decimal.NewFromInt(int64(tarik)))
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
