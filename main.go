@@ -19,8 +19,6 @@ func StartApp() {
 	fmt.Println("\n>>>>>> Selamat Datang ! <<<<<<")
 	for {
 		OptionLogin()
-		// fmt.Println(LoginProccess())
-		// CheckError(nil)
 	}
 }
 
@@ -33,49 +31,49 @@ type AccountBank struct {
 }
 
 type HistoryTransaction struct {
-	Date        time.Time
+	Date        string
 	Transaction string
 	Amount      decimal.Decimal
 	Balance     decimal.Decimal
 }
 
 var listAccount = []AccountBank{
-	AccountBank{
+	{
 		IdAccount:  111122223333,
 		PinAccount: 123456,
 		Name:       "Akun1",
 		Balance:    decimal.RequireFromString("500000"),
 		History: []HistoryTransaction{
-			HistoryTransaction{
-				Date:        time.Date(2022, 04, 26, 8, 00, 00, 00, time.Local),
+			{
+				Date:        TimeDateNow(),
 				Transaction: "Setor",
 				Amount:      decimal.RequireFromString("500000"),
 				Balance:     decimal.RequireFromString("500000"),
 			},
 		},
 	},
-	AccountBank{
+	{
 		IdAccount:  222233334444,
 		PinAccount: 123456,
 		Name:       "Akun2",
 		Balance:    decimal.RequireFromString("1000000"),
 		History: []HistoryTransaction{
-			HistoryTransaction{
-				Date:        time.Date(2022, 04, 26, 8, 00, 00, 00, time.Local),
+			{
+				Date:        TimeDateNow(),
 				Transaction: "Setor",
 				Amount:      decimal.RequireFromString("1000000"),
 				Balance:     decimal.RequireFromString("1000000"),
 			},
 		},
 	},
-	AccountBank{
+	{
 		IdAccount:  123412341234,
 		PinAccount: 123456,
 		Name:       "Akun3",
 		Balance:    decimal.RequireFromString("1500000"),
 		History: []HistoryTransaction{
-			HistoryTransaction{
-				Date:        time.Date(2022, 04, 26, 8, 00, 00, 00, time.Local),
+			{
+				Date:        TimeDateNow(),
 				Transaction: "Setor",
 				Amount:      decimal.RequireFromString("1500000"),
 				Balance:     decimal.RequireFromString("1500000"),
@@ -100,17 +98,18 @@ func OptionAccount(account *AccountBank) {
 		option, _ := InputScan()
 		switch option {
 		case "0":
+			fmt.Printf("\n")
 			fmt.Println(account.Name, "telah keluar")
 			fmt.Println("Terima Kasih")
 			isLogout = true
 		case "1":
-			tarikUang()
+			tarikUang(account)
 		case "2":
 			setorUang()
 		case "3":
 			transferUang()
 		case "4":
-			riwayatTransaksi()
+			riwayatTransaksi(account)
 		default:
 			fmt.Println("\n>>>>>> Pilihan Salah ! <<<<<<")
 		}
@@ -122,8 +121,63 @@ func OptionAccount(account *AccountBank) {
 }
 
 // fungsi untuk proses tarik uang
-func tarikUang() {
-	fmt.Println("Tarik Uang")
+func tarikUang(account *AccountBank) {
+	var isExit bool = false
+	var tarik int = 0
+	for {
+		fmt.Println("\nTarik Uang :")
+		fmt.Println("1. 50000")
+		fmt.Println("2. 100000")
+		fmt.Println("3. 200000")
+		fmt.Println("4. 300000")
+		fmt.Println("0. Keluar")
+		fmt.Printf("\nPilih Menu [1]/[2]/[3]/[4]/[0] : ")
+		option, _ := InputScan()
+		switch option {
+		case "0":
+			isExit = true
+		case "1":
+			tarik = 50000
+			isExit = true
+		case "2":
+			tarik = 100000
+			isExit = true
+		case "3":
+			tarik = 200000
+			isExit = true
+		case "4":
+			tarik = 300000
+			isExit = true
+		default:
+			fmt.Printf("\n>>>>>> Pilihan Salah ! <<<<<<")
+			fmt.Println()
+		}
+
+		if tarik != 0 {
+			if validasiSaldo(account, tarik) {
+				fmt.Println("\nAnda akan melakukan tarik uang", tarik)
+				fmt.Printf("\n[1] Ya / [0] Tidak : ")
+				opsi, _ := InputScan()
+				if opsi == "1" {
+					fmt.Println("Proses Tarik")
+					result := account.Balance.Sub(decimal.NewFromInt(int64(tarik)))
+					account.Balance = result
+					account.History = append(account.History, HistoryTransaction{
+						Date:        TimeDateNow(),
+						Transaction: "Tarik",
+						Amount:      decimal.NewFromInt(int64(tarik)),
+						Balance:     account.Balance,
+					})
+				}
+			} else {
+				fmt.Println("\nSaldo tidak cukup !")
+			}
+		}
+
+		if isExit {
+			break
+		}
+	}
 }
 
 // fungsi untuk proses setor uang
@@ -137,14 +191,25 @@ func transferUang() {
 }
 
 // lihat daftar riwayat transaksi
-func riwayatTransaksi() {
-	fmt.Println("Lihar Riwayat Transaksi")
+func riwayatTransaksi(account *AccountBank) {
+	fmt.Println("\nDaftar Riwayat Transaksi :")
+	for _, l := range account.History {
+		fmt.Printf("%v | %s | %v | %v \n", l.Date, l.Transaction, l.Amount, l.Balance)
+	}
+	fmt.Printf("\n(Tekan Enter)")
+	InputScan()
+}
+
+// fungsi untuk validasi saldo
+func validasiSaldo(saldo *AccountBank, tarik int) bool {
+	return saldo.Balance.GreaterThan(decimal.NewFromInt(int64(tarik)))
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // menampilkan menu login
 func OptionLogin() {
+	fmt.Println("\nSilahakan Login !")
 	fmt.Println("\n1. Login")
 	fmt.Println("0. Keluar")
 	fmt.Printf("\nPilih Menu [1]/[0] : ")
@@ -169,7 +234,6 @@ func OptionLogin() {
 
 // melakukan proses login
 func LoginProccess() *AccountBank {
-	fmt.Println("\nSilahakan Login !")
 	fmt.Println("\nMasukan Nomor Rekening :")
 
 	var account *AccountBank
@@ -246,6 +310,14 @@ func CheckError(err error) {
 		fmt.Println("Error :", err.Error())
 		return
 	}
+}
+
+// fungsi convert time.Time
+func TimeDateNow() string {
+	now := time.Now()
+	formatLayout := "2006-01-02 15:04:05"
+	dateNow := now.Format(formatLayout)
+	return dateNow
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
