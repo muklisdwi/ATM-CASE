@@ -21,7 +21,7 @@ Pin : 123456
 Saldo Awal : 1500000`
 
 ### Menjalankan Program
-Untuk menjalankan program, pastikan telah memiliki instalasi program golang yang sudah terpasang. Lalu jalankan perintah berikut di root folder aplikasi.
+Untuk menjalankan program, pastikan telah memiliki instalasi program golang yang sudah terpasang. Lalu jalankan perintah berikut di root folder aplikasi melalui terminal/cmd.
 
 `go run main.go`
 
