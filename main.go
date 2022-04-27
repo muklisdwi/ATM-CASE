@@ -327,14 +327,11 @@ func LoginProccess() *AccountBank {
 	fmt.Println("\nMasukan Nomor Rekening :")
 
 	var account *AccountBank
-	strId, err := InputScan()
-	CheckError(err)
-
+	strId, _ := InputScan()
 	if cekId, intId := checkIdAccount(strId); cekId {
 		// fmt.Println("\nNomor Rekening Benar !")
 		fmt.Println("\nMasukan PIN :")
-		strPass, err := InputScan()
-		CheckError(err)
+		strPass, _ := InputScan()
 		if cekPin, cekAccount := checkPassword(strPass, intId); cekPin {
 			account = cekAccount
 		} else {
@@ -392,14 +389,6 @@ func InputScan() (string, error) {
 	str = strings.ReplaceAll(str, " ", "")
 	str = strings.Replace(str, "\n", "", 1)
 	return str, nil
-}
-
-// fungsi tambahan untuk cek error misal perlu
-func CheckError(err error) {
-	if err != nil {
-		fmt.Println("Error :", err.Error())
-		return
-	}
 }
 
 // fungsi convert time.Time
