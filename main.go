@@ -37,7 +37,7 @@ type HistoryTransaction struct {
 	Balance     decimal.Decimal
 }
 
-var listAccount = []AccountBank{
+var listAccount = []*AccountBank{
 	{
 		IdAccount:  111122223333,
 		PinAccount: 123456,
@@ -107,7 +107,7 @@ func OptionAccount(account *AccountBank) {
 		case "2":
 			setorUang(account)
 		case "3":
-			transferUang()
+			transferUang(account)
 		case "4":
 			riwayatTransaksi(account)
 		default:
@@ -168,6 +168,8 @@ func tarikUang(account *AccountBank) {
 						Amount:      decimal.NewFromInt(int64(tarik)),
 						Balance:     account.Balance,
 					})
+				} else {
+					fmt.Println("\nTransaksi dibatalkan !")
 				}
 			} else {
 				fmt.Println("\nSaldo tidak cukup !")
@@ -192,15 +194,22 @@ func setorUang(account *AccountBank) {
 		return
 	}
 	if setor.Mod(decimal.NewFromInt(int64(50000))).Equal(decimal.NewFromInt32(0)) {
-		fmt.Println("\n>>>>>> Setoran diproses <<<<<")
-		result := setor.Add(account.Balance)
-		account.Balance = result
-		account.History = append(account.History, HistoryTransaction{
-			Date:        TimeDateNow(),
-			Transaction: "Setor",
-			Amount:      setor,
-			Balance:     result,
-		})
+		fmt.Println("\nAnda akan melakukan setor uang", nominal)
+		fmt.Printf("\n[1] Ya / [0] Tidak : ")
+		opsi, _ := InputScan()
+		if opsi == "1" {
+			result := setor.Add(account.Balance)
+			account.Balance = result
+			account.History = append(account.History, HistoryTransaction{
+				Date:        TimeDateNow(),
+				Transaction: "Setor",
+				Amount:      setor,
+				Balance:     result,
+			})
+			fmt.Println("\n>>>>>> Setoran diproses <<<<<")
+		} else {
+			fmt.Println("\nTransaksi dibatalkan !")
+		}
 	} else {
 		fmt.Println("\n>>>>>> Nominal Salah ! <<<<<<")
 		return
@@ -208,8 +217,54 @@ func setorUang(account *AccountBank) {
 }
 
 // proses transfer uang
-func transferUang() {
-	fmt.Println("Transfer")
+func transferUang(accountPengirim *AccountBank) {
+	fmt.Println("\nTransfer :")
+	fmt.Println("Masukan nomor rekening tujuan :")
+	strNorek, _ := InputScan()
+	intNorek, err := strconv.Atoi(strNorek)
+	if err != nil {
+		fmt.Printf("\n>>>>>> Masukan Salah ! <<<<<<")
+		return
+	}
+	if check, accountPenerima := findAccount(intNorek); check {
+		fmt.Println("\nMasukan nominal transfer : ")
+		strNominal, _ := InputScan()
+		intNominal, err := strconv.Atoi(strNominal)
+		if err != nil {
+			fmt.Println("\n>>>>>> Nominal Salah ! <<<<<<")
+			return
+		}
+		if validasiSaldo(accountPengirim, intNominal) {
+			fmt.Println("\nAnda akan melakukan transfer uang", strNominal, "\nke rekening",
+				accountPenerima.IdAccount, "a/n", accountPenerima.Name)
+			fmt.Printf("\n[1] Ya / [0] Tidak : ")
+			opsi, _ := InputScan()
+			if opsi == "1" {
+				decimalNominal := decimal.NewFromInt(int64(intNominal)).Abs()
+				accountPengirim.Balance = accountPengirim.Balance.Sub(decimalNominal)
+				accountPengirim.History = append(accountPengirim.History, HistoryTransaction{
+					Date:        TimeDateNow(),
+					Transaction: "Kirim",
+					Amount:      decimalNominal,
+					Balance:     accountPengirim.Balance,
+				})
+				accountPenerima.Balance = accountPenerima.Balance.Add(decimalNominal)
+				accountPenerima.History = append(accountPenerima.History, HistoryTransaction{
+					Date:        TimeDateNow(),
+					Transaction: "Terima",
+					Amount:      decimalNominal,
+					Balance:     accountPenerima.Balance,
+				})
+				fmt.Println("\n>>>>> Transfer Berhasil ! <<<<")
+			} else {
+				fmt.Println("\nTransaksi dibatalkan !")
+			}
+		} else {
+			fmt.Println("\n>>>>> Saldo tidak cukup ! <<<<")
+		}
+	} else {
+		fmt.Println("\n>>> Akun tidak ditemukan ! <<<")
+	}
 }
 
 // lihat daftar riwayat transaksi
@@ -225,6 +280,19 @@ func riwayatTransaksi(account *AccountBank) {
 // fungsi untuk validasi saldo
 func validasiSaldo(saldo *AccountBank, tarik int) bool {
 	return saldo.Balance.GreaterThanOrEqual(decimal.NewFromInt(int64(tarik)))
+}
+
+// fungsi untuk cari rekening tujuan
+func findAccount(id int) (bool, *AccountBank) {
+	var check bool = false
+	var account *AccountBank
+	for i, l := range listAccount {
+		if id == l.IdAccount {
+			check = true
+			account = listAccount[i]
+		}
+	}
+	return check, account
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -281,7 +349,7 @@ func LoginProccess() *AccountBank {
 
 // proses cek password
 func checkPassword(strPass string, id int) (bool, *AccountBank) {
-	var account AccountBank
+	var account *AccountBank
 	var check bool = false
 	pinAccount, err := strconv.Atoi(strPass)
 	if err != nil {
@@ -293,7 +361,7 @@ func checkPassword(strPass string, id int) (bool, *AccountBank) {
 			account = listAccount[i]
 		}
 	}
-	return check, &account
+	return check, account
 }
 
 // proses cek nomor rekening
