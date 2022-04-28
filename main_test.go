@@ -2,7 +2,6 @@ package main
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -67,20 +66,4 @@ func TestMain_checkIdAccount_Ok(t *testing.T) {
 	assert.True(t, check)
 	assert.IsType(t, id, 1)
 	assert.Equal(t, id, 123412341234)
-}
-
-func TestMain_InputScan(t *testing.T) {
-	str, err := InputScan()
-	assert.Error(t, err, "Harus Error")
-	assert.EqualValues(t, str, "", "kosong")
-}
-
-func TestMain_TimeDateNow_BedaFormat(t *testing.T) {
-	assert.NotEqual(t, TimeDateNow(), time.Now().String(), "Cek tanggal")
-}
-
-func TestMain_TimeDateNow_Ok(t *testing.T) {
-	date := TimeDateNow()
-	strDate := time.Now().Format("2006-01-02 15:04:05")
-	assert.Equal(t, date, strDate, "Harus sesuai")
 }

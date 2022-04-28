@@ -1,12 +1,10 @@
 package main
 
 import (
-	"bufio"
+	"atmcase/utils"
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
-	"time"
 
 	"github.com/shopspring/decimal"
 )
@@ -45,7 +43,7 @@ var listAccount = []*AccountBank{
 		Balance:    decimal.RequireFromString("500000"),
 		History: []HistoryTransaction{
 			{
-				Date:        TimeDateNow(),
+				Date:        utils.TimeDateNow(),
 				Transaction: "Setor",
 				Amount:      decimal.RequireFromString("500000"),
 				Balance:     decimal.RequireFromString("500000"),
@@ -59,7 +57,7 @@ var listAccount = []*AccountBank{
 		Balance:    decimal.RequireFromString("1000000"),
 		History: []HistoryTransaction{
 			{
-				Date:        TimeDateNow(),
+				Date:        utils.TimeDateNow(),
 				Transaction: "Setor",
 				Amount:      decimal.RequireFromString("1000000"),
 				Balance:     decimal.RequireFromString("1000000"),
@@ -73,7 +71,7 @@ var listAccount = []*AccountBank{
 		Balance:    decimal.RequireFromString("1500000"),
 		History: []HistoryTransaction{
 			{
-				Date:        TimeDateNow(),
+				Date:        utils.TimeDateNow(),
 				Transaction: "Setor",
 				Amount:      decimal.RequireFromString("1500000"),
 				Balance:     decimal.RequireFromString("1500000"),
@@ -95,7 +93,7 @@ func OptionAccount(account *AccountBank) {
 		fmt.Println("4. Lihat Riwayat Transaksi")
 		fmt.Println("0. Keluar")
 		fmt.Printf("\nPilih Menu [1]/[2]/[3]/[4]/[0] : ")
-		option, _ := InputScan()
+		option, _ := utils.InputScan()
 		switch option {
 		case "0":
 			fmt.Printf("\n")
@@ -132,7 +130,7 @@ func tarikUang(account *AccountBank) {
 		fmt.Println("4. 300000")
 		fmt.Println("0. Keluar")
 		fmt.Printf("\nPilih Menu [1]/[2]/[3]/[4]/[0] : ")
-		option, _ := InputScan()
+		option, _ := utils.InputScan()
 		switch option {
 		case "0":
 			isExit = true
@@ -157,13 +155,13 @@ func tarikUang(account *AccountBank) {
 			if validasiSaldo(account, tarik) {
 				fmt.Println("\nAnda akan melakukan tarik uang", tarik)
 				fmt.Printf("\n[1] Ya / [0] Tidak : ")
-				opsi, _ := InputScan()
+				opsi, _ := utils.InputScan()
 				if opsi == "1" {
 					fmt.Println("\n>>>>> Penarikan diproses <<<<")
 					result := account.Balance.Sub(decimal.NewFromInt(int64(tarik)))
 					account.Balance = result
 					account.History = append(account.History, HistoryTransaction{
-						Date:        TimeDateNow(),
+						Date:        utils.TimeDateNow(),
 						Transaction: "Tarik",
 						Amount:      decimal.NewFromInt(int64(tarik)),
 						Balance:     account.Balance,
@@ -187,7 +185,7 @@ func setorUang(account *AccountBank) {
 	fmt.Println("\nSetor Uang :")
 	fmt.Println("Setor hanya menerima kelipatan 50000")
 	fmt.Printf("\nMasukan jumlah nominal : ")
-	nominal, _ := InputScan()
+	nominal, _ := utils.InputScan()
 	setor, err := decimal.NewFromString(nominal)
 	if err != nil {
 		fmt.Println("\n>>>>>> Masukan Salah ! <<<<<<")
@@ -196,12 +194,12 @@ func setorUang(account *AccountBank) {
 	if setor.Mod(decimal.NewFromInt(int64(50000))).Equal(decimal.NewFromInt32(0)) {
 		fmt.Println("\nAnda akan melakukan setor uang", nominal)
 		fmt.Printf("\n[1] Ya / [0] Tidak : ")
-		opsi, _ := InputScan()
+		opsi, _ := utils.InputScan()
 		if opsi == "1" {
 			result := setor.Add(account.Balance)
 			account.Balance = result
 			account.History = append(account.History, HistoryTransaction{
-				Date:        TimeDateNow(),
+				Date:        utils.TimeDateNow(),
 				Transaction: "Setor",
 				Amount:      setor,
 				Balance:     result,
@@ -220,7 +218,7 @@ func setorUang(account *AccountBank) {
 func transferUang(accountPengirim *AccountBank) {
 	fmt.Println("\nTransfer :")
 	fmt.Println("Masukan nomor rekening tujuan :")
-	strNorek, _ := InputScan()
+	strNorek, _ := utils.InputScan()
 	intNorek, err := strconv.Atoi(strNorek)
 	if err != nil {
 		fmt.Printf("\n>>>>>> Masukan Salah ! <<<<<<")
@@ -228,7 +226,7 @@ func transferUang(accountPengirim *AccountBank) {
 	}
 	if check, accountPenerima := findAccount(intNorek); check {
 		fmt.Println("\nMasukan nominal transfer : ")
-		strNominal, _ := InputScan()
+		strNominal, _ := utils.InputScan()
 		intNominal, err := strconv.Atoi(strNominal)
 		if err != nil {
 			fmt.Println("\n>>>>>> Nominal Salah ! <<<<<<")
@@ -238,19 +236,19 @@ func transferUang(accountPengirim *AccountBank) {
 			fmt.Println("\nAnda akan melakukan transfer uang", strNominal, "\nke rekening",
 				accountPenerima.IdAccount, "a/n", accountPenerima.Name)
 			fmt.Printf("\n[1] Ya / [0] Tidak : ")
-			opsi, _ := InputScan()
+			opsi, _ := utils.InputScan()
 			if opsi == "1" {
 				decimalNominal := decimal.NewFromInt(int64(intNominal)).Abs()
 				accountPengirim.Balance = accountPengirim.Balance.Sub(decimalNominal)
 				accountPengirim.History = append(accountPengirim.History, HistoryTransaction{
-					Date:        TimeDateNow(),
+					Date:        utils.TimeDateNow(),
 					Transaction: "Kirim",
 					Amount:      decimalNominal,
 					Balance:     accountPengirim.Balance,
 				})
 				accountPenerima.Balance = accountPenerima.Balance.Add(decimalNominal)
 				accountPenerima.History = append(accountPenerima.History, HistoryTransaction{
-					Date:        TimeDateNow(),
+					Date:        utils.TimeDateNow(),
 					Transaction: "Terima",
 					Amount:      decimalNominal,
 					Balance:     accountPenerima.Balance,
@@ -274,7 +272,7 @@ func riwayatTransaksi(account *AccountBank) {
 		fmt.Printf("%v | %s | %v | %v \n", l.Date, l.Transaction, l.Amount, l.Balance)
 	}
 	fmt.Printf("\n(Tekan Enter)")
-	InputScan()
+	utils.InputScan()
 }
 
 // fungsi untuk validasi saldo
@@ -303,7 +301,7 @@ func OptionLogin() {
 	fmt.Println("\n1. Login")
 	fmt.Println("0. Keluar")
 	fmt.Printf("\nPilih Menu [1]/[0] : ")
-	option, _ := InputScan()
+	option, _ := utils.InputScan()
 	switch option {
 	case "0":
 		fmt.Println("\n>>>>>> Terima Kasih ! <<<<<<")
@@ -327,11 +325,11 @@ func LoginProccess() *AccountBank {
 	fmt.Println("\nMasukan Nomor Rekening :")
 
 	var account *AccountBank
-	strId, _ := InputScan()
+	strId, _ := utils.InputScan()
 	if cekId, intId := checkIdAccount(strId); cekId {
 		// fmt.Println("\nNomor Rekening Benar !")
 		fmt.Println("\nMasukan PIN :")
-		strPass, _ := InputScan()
+		strPass, _ := utils.InputScan()
 		if cekPin, cekAccount := checkPassword(strPass, intId); cekPin {
 			account = cekAccount
 		} else {
@@ -376,27 +374,3 @@ func checkIdAccount(str string) (bool, int) {
 	}
 	return check, idAccount
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// fungsi untuk menerima input keyboard
-func InputScan() (string, error) {
-	reader := bufio.NewReader(os.Stdin)
-	str, err := reader.ReadString('\n')
-	if err != nil {
-		return str, err
-	}
-	str = strings.ReplaceAll(str, " ", "")
-	str = strings.Replace(str, "\n", "", 1)
-	return str, nil
-}
-
-// fungsi convert time.Time
-func TimeDateNow() string {
-	now := time.Now()
-	formatLayout := "2006-01-02 15:04:05"
-	dateNow := now.Format(formatLayout)
-	return dateNow
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
