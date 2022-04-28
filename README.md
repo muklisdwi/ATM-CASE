@@ -22,9 +22,11 @@ Saldo Awal : 1500000`
 
 ### Menjalankan Program
 Untuk menjalankan program, pastikan telah memiliki instalasi program golang yang sudah terpasang. Lalu jalankan perintah berikut di root folder aplikasi melalui terminal/cmd.
+```
+$ go build
 
-`go run main.go`
-
+$ ./atmcase
+```
 ### Contoh Login
 ```
 >>>>>> Selamat Datang ! <<<<<<

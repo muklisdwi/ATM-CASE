@@ -1,5 +1,7 @@
 package main
 
+import "atmcase/app"
+
 func main() {
-	StartApp()
+	app.StartApp()
 }
