@@ -1,6 +1,7 @@
 package main
 
 import (
+	"atmcase/model"
 	"atmcase/utils"
 	"fmt"
 	"os"
@@ -20,28 +21,13 @@ func StartApp() {
 	}
 }
 
-type AccountBank struct {
-	IdAccount  int
-	PinAccount int
-	Name       string
-	Balance    decimal.Decimal
-	History    []HistoryTransaction
-}
-
-type HistoryTransaction struct {
-	Date        string
-	Transaction string
-	Amount      decimal.Decimal
-	Balance     decimal.Decimal
-}
-
-var listAccount = []*AccountBank{
+var listAccount = []*model.AccountBank{
 	{
 		IdAccount:  111122223333,
 		PinAccount: 123456,
 		Name:       "Akun1",
 		Balance:    decimal.RequireFromString("500000"),
-		History: []HistoryTransaction{
+		History: []model.HistoryTransaction{
 			{
 				Date:        utils.TimeDateNow(),
 				Transaction: "Setor",
@@ -55,7 +41,7 @@ var listAccount = []*AccountBank{
 		PinAccount: 123456,
 		Name:       "Akun2",
 		Balance:    decimal.RequireFromString("1000000"),
-		History: []HistoryTransaction{
+		History: []model.HistoryTransaction{
 			{
 				Date:        utils.TimeDateNow(),
 				Transaction: "Setor",
@@ -69,7 +55,7 @@ var listAccount = []*AccountBank{
 		PinAccount: 123456,
 		Name:       "Akun3",
 		Balance:    decimal.RequireFromString("1500000"),
-		History: []HistoryTransaction{
+		History: []model.HistoryTransaction{
 			{
 				Date:        utils.TimeDateNow(),
 				Transaction: "Setor",
@@ -83,7 +69,7 @@ var listAccount = []*AccountBank{
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // menampilkan menu akun setelah login berhasil
-func OptionAccount(account *AccountBank) {
+func OptionAccount(account *model.AccountBank) {
 	var isLogout bool = false
 	for {
 		fmt.Println("\nSelamat Datang,", account.Name)
@@ -119,7 +105,7 @@ func OptionAccount(account *AccountBank) {
 }
 
 // fungsi untuk proses tarik uang
-func tarikUang(account *AccountBank) {
+func tarikUang(account *model.AccountBank) {
 	var isExit bool = false
 	var tarik int = 0
 	for {
@@ -160,7 +146,7 @@ func tarikUang(account *AccountBank) {
 					fmt.Println("\n>>>>> Penarikan diproses <<<<")
 					result := account.Balance.Sub(decimal.NewFromInt(int64(tarik)))
 					account.Balance = result
-					account.History = append(account.History, HistoryTransaction{
+					account.History = append(account.History, model.HistoryTransaction{
 						Date:        utils.TimeDateNow(),
 						Transaction: "Tarik",
 						Amount:      decimal.NewFromInt(int64(tarik)),
@@ -181,7 +167,7 @@ func tarikUang(account *AccountBank) {
 }
 
 // fungsi untuk proses setor uang
-func setorUang(account *AccountBank) {
+func setorUang(account *model.AccountBank) {
 	fmt.Println("\nSetor Uang :")
 	fmt.Println("Setor hanya menerima kelipatan 50000")
 	fmt.Printf("\nMasukan jumlah nominal : ")
@@ -198,7 +184,7 @@ func setorUang(account *AccountBank) {
 		if opsi == "1" {
 			result := setor.Add(account.Balance)
 			account.Balance = result
-			account.History = append(account.History, HistoryTransaction{
+			account.History = append(account.History, model.HistoryTransaction{
 				Date:        utils.TimeDateNow(),
 				Transaction: "Setor",
 				Amount:      setor,
@@ -215,7 +201,7 @@ func setorUang(account *AccountBank) {
 }
 
 // proses transfer uang
-func transferUang(accountPengirim *AccountBank) {
+func transferUang(accountPengirim *model.AccountBank) {
 	fmt.Println("\nTransfer :")
 	fmt.Println("Masukan nomor rekening tujuan :")
 	strNorek, _ := utils.InputScan()
@@ -240,14 +226,14 @@ func transferUang(accountPengirim *AccountBank) {
 			if opsi == "1" {
 				decimalNominal := decimal.NewFromInt(int64(intNominal)).Abs()
 				accountPengirim.Balance = accountPengirim.Balance.Sub(decimalNominal)
-				accountPengirim.History = append(accountPengirim.History, HistoryTransaction{
+				accountPengirim.History = append(accountPengirim.History, model.HistoryTransaction{
 					Date:        utils.TimeDateNow(),
 					Transaction: "Kirim",
 					Amount:      decimalNominal,
 					Balance:     accountPengirim.Balance,
 				})
 				accountPenerima.Balance = accountPenerima.Balance.Add(decimalNominal)
-				accountPenerima.History = append(accountPenerima.History, HistoryTransaction{
+				accountPenerima.History = append(accountPenerima.History, model.HistoryTransaction{
 					Date:        utils.TimeDateNow(),
 					Transaction: "Terima",
 					Amount:      decimalNominal,
@@ -266,7 +252,7 @@ func transferUang(accountPengirim *AccountBank) {
 }
 
 // lihat daftar riwayat transaksi
-func riwayatTransaksi(account *AccountBank) {
+func riwayatTransaksi(account *model.AccountBank) {
 	fmt.Println("\nDaftar Riwayat Transaksi :")
 	for _, l := range account.History {
 		fmt.Printf("%v | %s | %v | %v \n", l.Date, l.Transaction, l.Amount, l.Balance)
@@ -276,14 +262,14 @@ func riwayatTransaksi(account *AccountBank) {
 }
 
 // fungsi untuk validasi saldo
-func validasiSaldo(saldo *AccountBank, tarik int) bool {
+func validasiSaldo(saldo *model.AccountBank, tarik int) bool {
 	return saldo.Balance.GreaterThanOrEqual(decimal.NewFromInt(int64(tarik)))
 }
 
 // fungsi untuk cari rekening tujuan
-func findAccount(id int) (bool, *AccountBank) {
+func findAccount(id int) (bool, *model.AccountBank) {
 	var check bool = false
-	var account *AccountBank
+	var account *model.AccountBank
 	for i, l := range listAccount {
 		if id == l.IdAccount {
 			check = true
@@ -321,10 +307,10 @@ func OptionLogin() {
 }
 
 // melakukan proses login
-func LoginProccess() *AccountBank {
+func LoginProccess() *model.AccountBank {
 	fmt.Println("\nMasukan Nomor Rekening :")
 
-	var account *AccountBank
+	var account *model.AccountBank
 	strId, _ := utils.InputScan()
 	if cekId, intId := checkIdAccount(strId); cekId {
 		// fmt.Println("\nNomor Rekening Benar !")
@@ -343,8 +329,8 @@ func LoginProccess() *AccountBank {
 }
 
 // proses cek password
-func checkPassword(strPass string, id int) (bool, *AccountBank) {
-	var account *AccountBank
+func checkPassword(strPass string, id int) (bool, *model.AccountBank) {
+	var account *model.AccountBank
 	var check bool = false
 	pinAccount, err := strconv.Atoi(strPass)
 	if err != nil {
