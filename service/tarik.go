@@ -39,29 +39,33 @@ func TarikUang(account *model.AccountBank) {
 		default:
 			fmt.Printf("\n>>>>>> Pilihan Salah ! <<<<<<")
 			fmt.Println()
+			isExit = true
 		}
 
-		if tarik != 0 {
-			if account.ValidasiSaldo(tarik) {
-				fmt.Println("\nAnda akan melakukan tarik uang", tarik)
-				fmt.Printf("\n[1] Ya / [0] Tidak : ")
-				opsi, _ := utils.InputScan()
-				if opsi == "1" {
-					fmt.Println("\n>>>>> Penarikan diproses <<<<")
-					result := account.Balance.Sub(decimal.NewFromInt(int64(tarik)))
-					account.Balance = result
-					account.History = append(account.History, model.HistoryTransaction{
-						Date:        utils.TimeDateNow(),
-						Transaction: "Tarik",
-						Amount:      decimal.NewFromInt(int64(tarik)),
-						LastBalance: account.Balance,
-					})
-				} else {
-					fmt.Println("\nTransaksi dibatalkan !")
-				}
-			} else {
-				fmt.Println("\nSaldo tidak cukup !")
-			}
+		if tarik == 0 && isExit {
+			break
+		}
+
+		if !account.ValidasiSaldo(tarik) {
+			fmt.Println("\nSaldo tidak cukup !")
+			continue
+		}
+
+		fmt.Println("\nAnda akan melakukan tarik uang", tarik)
+		fmt.Printf("\n[1] Ya / [0] Tidak : ")
+		opsi, _ := utils.InputScan()
+		if opsi == "1" {
+			fmt.Println("\n>>>>> Penarikan diproses <<<<")
+			result := account.Balance.Sub(decimal.NewFromInt(int64(tarik)))
+			account.Balance = result
+			account.History = append(account.History, model.HistoryTransaction{
+				Date:        utils.TimeDateNow(),
+				Transaction: "Tarik",
+				Amount:      decimal.NewFromInt(int64(tarik)),
+				LastBalance: account.Balance,
+			})
+		} else {
+			fmt.Println("\nTransaksi dibatalkan !")
 		}
 
 		if isExit {

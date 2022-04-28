@@ -19,6 +19,6 @@ func TestMain_TimeDateNow_BedaFormat(t *testing.T) {
 
 func TestMain_TimeDateNow_Ok(t *testing.T) {
 	date := TimeDateNow()
-	strDate := time.Now().Format("2006-01-02 15:04:05")
+	strDate := time.Now().Format(formatLayout)
 	assert.Equal(t, date, strDate, "Harus sesuai")
 }

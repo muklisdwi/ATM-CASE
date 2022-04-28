@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const formatLayout = "2006-01-02 15:04:05"
+
 // fungsi untuk menerima input keyboard
 func InputScan() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
@@ -22,7 +24,6 @@ func InputScan() (string, error) {
 // fungsi convert time.Time
 func TimeDateNow() string {
 	now := time.Now()
-	formatLayout := "2006-01-02 15:04:05"
 	dateNow := now.Format(formatLayout)
 	return dateNow
 }

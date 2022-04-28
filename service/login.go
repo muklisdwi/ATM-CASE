@@ -11,22 +11,20 @@ import (
 func LoginProccess(listAccount []*model.AccountBank) *model.AccountBank {
 	fmt.Println("\nMasukan Nomor Rekening :")
 
-	var account *model.AccountBank
 	strId, _ := utils.InputScan()
-	if cekId, intId := checkIdAccount(strId, listAccount); cekId {
-		// fmt.Println("\nNomor Rekening Benar !")
-		fmt.Println("\nMasukan PIN :")
-		strPass, _ := utils.InputScan()
-		if cekPin, cekAccount := checkPassword(strPass, intId, listAccount); cekPin {
-			account = cekAccount
-		} else {
-			fmt.Println("\nPin Anda Salah !")
-		}
-	} else {
+	cekId, intId := checkIdAccount(strId, listAccount)
+	if !cekId {
 		fmt.Println("\nNomor Rekening Salah !")
 	}
 
-	return account
+	fmt.Println("\nMasukan PIN :")
+	strPass, _ := utils.InputScan()
+	cekPin, cekAccount := checkPassword(strPass, intId, listAccount)
+	if !cekPin {
+		fmt.Println("\nPin Anda Salah !")
+	}
+
+	return cekAccount
 }
 
 // proses cek password
@@ -41,6 +39,7 @@ func checkPassword(strPass string, id int, listAccount []*model.AccountBank) (bo
 		if l.IdAccount == id && l.PinAccount == pinAccount {
 			check = true
 			account = listAccount[i]
+			break
 		}
 	}
 	return check, account

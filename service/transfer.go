@@ -14,49 +14,58 @@ func TransferUang(accountPengirim *model.AccountBank, listAccount []*model.Accou
 	fmt.Println("\nTransfer :")
 	fmt.Println("Masukan nomor rekening tujuan :")
 	strNorek, _ := utils.InputScan()
+
 	intNorek, err := strconv.Atoi(strNorek)
 	if err != nil {
 		fmt.Printf("\n>>>>>> Masukan Salah ! <<<<<<")
 		return
 	}
-	if check, accountPenerima := findAccount(intNorek, listAccount); check {
-		fmt.Println("\nMasukan nominal transfer : ")
-		strNominal, _ := utils.InputScan()
-		intNominal, err := strconv.Atoi(strNominal)
-		if err != nil {
-			fmt.Println("\n>>>>>> Nominal Salah ! <<<<<<")
-			return
-		}
-		if accountPengirim.ValidasiSaldo(intNominal) {
-			fmt.Println("\nAnda akan melakukan transfer uang", strNominal, "\nke rekening",
-				accountPenerima.IdAccount, "a/n", accountPenerima.Name)
-			fmt.Printf("\n[1] Ya / [0] Tidak : ")
-			opsi, _ := utils.InputScan()
-			if opsi == "1" {
-				decimalNominal := decimal.NewFromInt(int64(intNominal)).Abs()
-				accountPengirim.Balance = accountPengirim.Balance.Sub(decimalNominal)
-				accountPengirim.History = append(accountPengirim.History, model.HistoryTransaction{
-					Date:        utils.TimeDateNow(),
-					Transaction: "Kirim",
-					Amount:      decimalNominal,
-					LastBalance: accountPengirim.Balance,
-				})
-				accountPenerima.Balance = accountPenerima.Balance.Add(decimalNominal)
-				accountPenerima.History = append(accountPenerima.History, model.HistoryTransaction{
-					Date:        utils.TimeDateNow(),
-					Transaction: "Terima",
-					Amount:      decimalNominal,
-					LastBalance: accountPenerima.Balance,
-				})
-				fmt.Println("\n>>>>> Transfer Berhasil ! <<<<")
-			} else {
-				fmt.Println("\nTransaksi dibatalkan !")
-			}
-		} else {
-			fmt.Println("\n>>>>> Saldo tidak cukup ! <<<<")
-		}
-	} else {
+
+	check, accountPenerima := findAccount(intNorek, listAccount)
+	if !check {
 		fmt.Println("\n>>> Akun tidak ditemukan ! <<<")
+		return
+	}
+
+	fmt.Println("\nMasukan nominal transfer : ")
+	strNominal, _ := utils.InputScan()
+
+	intNominal, err := strconv.Atoi(strNominal)
+	if err != nil {
+		fmt.Println("\n>>>>>> Nominal Salah ! <<<<<<")
+		return
+	}
+
+	isSaldoValid := accountPengirim.ValidasiSaldo(intNominal)
+	if !isSaldoValid {
+		fmt.Println("\n>>>>> Saldo tidak cukup ! <<<<")
+		return
+	}
+
+	fmt.Println("\nAnda akan melakukan transfer uang", strNominal, "\nke rekening",
+		accountPenerima.IdAccount, "a/n", accountPenerima.Name)
+
+	fmt.Printf("\n[1] Ya / [0] Tidak : ")
+	opsi, _ := utils.InputScan()
+	if opsi == "1" {
+		decimalNominal := decimal.NewFromInt(int64(intNominal)).Abs()
+		accountPengirim.Balance = accountPengirim.Balance.Sub(decimalNominal)
+		accountPengirim.History = append(accountPengirim.History, model.HistoryTransaction{
+			Date:        utils.TimeDateNow(),
+			Transaction: "Kirim",
+			Amount:      decimalNominal,
+			LastBalance: accountPengirim.Balance,
+		})
+		accountPenerima.Balance = accountPenerima.Balance.Add(decimalNominal)
+		accountPenerima.History = append(accountPenerima.History, model.HistoryTransaction{
+			Date:        utils.TimeDateNow(),
+			Transaction: "Terima",
+			Amount:      decimalNominal,
+			LastBalance: accountPenerima.Balance,
+		})
+		fmt.Println("\n>>>>> Transfer Berhasil ! <<<<")
+	} else {
+		fmt.Println("\nTransaksi dibatalkan !")
 	}
 }
 
@@ -68,6 +77,7 @@ func findAccount(id int, listAccount []*model.AccountBank) (bool, *model.Account
 		if id == l.IdAccount {
 			check = true
 			account = listAccount[i]
+			break
 		}
 	}
 	return check, account
