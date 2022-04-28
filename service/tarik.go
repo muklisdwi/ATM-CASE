@@ -54,7 +54,7 @@ func TarikUang(account *model.AccountBank) {
 						Date:        utils.TimeDateNow(),
 						Transaction: "Tarik",
 						Amount:      decimal.NewFromInt(int64(tarik)),
-						Balance:     account.Balance,
+						LastBalance: account.Balance,
 					})
 				} else {
 					fmt.Println("\nTransaksi dibatalkan !")

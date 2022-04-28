@@ -10,7 +10,7 @@ import (
 )
 
 // proses transfer uang
-func TransferUang(accountPengirim *model.AccountBank) {
+func TransferUang(accountPengirim *model.AccountBank, listAccount []*model.AccountBank) {
 	fmt.Println("\nTransfer :")
 	fmt.Println("Masukan nomor rekening tujuan :")
 	strNorek, _ := utils.InputScan()
@@ -19,7 +19,7 @@ func TransferUang(accountPengirim *model.AccountBank) {
 		fmt.Printf("\n>>>>>> Masukan Salah ! <<<<<<")
 		return
 	}
-	if check, accountPenerima := findAccount(intNorek); check {
+	if check, accountPenerima := findAccount(intNorek, listAccount); check {
 		fmt.Println("\nMasukan nominal transfer : ")
 		strNominal, _ := utils.InputScan()
 		intNominal, err := strconv.Atoi(strNominal)
@@ -39,14 +39,14 @@ func TransferUang(accountPengirim *model.AccountBank) {
 					Date:        utils.TimeDateNow(),
 					Transaction: "Kirim",
 					Amount:      decimalNominal,
-					Balance:     accountPengirim.Balance,
+					LastBalance: accountPengirim.Balance,
 				})
 				accountPenerima.Balance = accountPenerima.Balance.Add(decimalNominal)
 				accountPenerima.History = append(accountPenerima.History, model.HistoryTransaction{
 					Date:        utils.TimeDateNow(),
 					Transaction: "Terima",
 					Amount:      decimalNominal,
-					Balance:     accountPenerima.Balance,
+					LastBalance: accountPenerima.Balance,
 				})
 				fmt.Println("\n>>>>> Transfer Berhasil ! <<<<")
 			} else {
@@ -61,13 +61,13 @@ func TransferUang(accountPengirim *model.AccountBank) {
 }
 
 // fungsi untuk cari rekening tujuan
-func findAccount(id int) (bool, *model.AccountBank) {
+func findAccount(id int, listAccount []*model.AccountBank) (bool, *model.AccountBank) {
 	var check bool = false
 	var account *model.AccountBank
-	for i, l := range model.ListAccount {
+	for i, l := range listAccount {
 		if id == l.IdAccount {
 			check = true
-			account = model.ListAccount[i]
+			account = listAccount[i]
 		}
 	}
 	return check, account

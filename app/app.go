@@ -9,15 +9,15 @@ import (
 )
 
 // fungsi untuk menjalankan aplikasi
-func StartApp() {
+func StartApp(listAccount []*model.AccountBank) {
 	fmt.Println("\n>>>>>> Selamat Datang ! <<<<<<")
 	for {
-		OptionLogin()
+		OptionLogin(listAccount)
 	}
 }
 
 // menampilkan menu login
-func OptionLogin() {
+func OptionLogin(listAccount []*model.AccountBank) {
 	fmt.Println("\nSilahakan Login !")
 	fmt.Println("\n1. Login")
 	fmt.Println("0. Keluar")
@@ -29,9 +29,9 @@ func OptionLogin() {
 		fmt.Println()
 		os.Exit(0)
 	case "1":
-		isAccount := service.LoginProccess(model.ListAccount)
+		isAccount := service.LoginProccess(listAccount)
 		if isAccount != nil {
-			OptionAccount(isAccount)
+			OptionAccount(isAccount, listAccount)
 		} else {
 			fmt.Println("Login Gagal !")
 		}
@@ -42,7 +42,7 @@ func OptionLogin() {
 }
 
 // menampilkan menu akun setelah login berhasil
-func OptionAccount(account *model.AccountBank) {
+func OptionAccount(account *model.AccountBank, listAccount []*model.AccountBank) {
 	var isLogout bool = false
 	for {
 		fmt.Println("\nSelamat Datang,", account.Name)
@@ -64,7 +64,7 @@ func OptionAccount(account *model.AccountBank) {
 		case "2":
 			service.SetorUang(account)
 		case "3":
-			service.TransferUang(account)
+			service.TransferUang(account, listAccount)
 		case "4":
 			service.RiwayatTransaksi(account)
 		default:

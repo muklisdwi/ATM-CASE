@@ -30,7 +30,7 @@ func SetorUang(account *model.AccountBank) {
 				Date:        utils.TimeDateNow(),
 				Transaction: "Setor",
 				Amount:      setor,
-				Balance:     result,
+				LastBalance: result,
 			})
 			fmt.Println("\n>>>>>> Setoran diproses <<<<<")
 		} else {

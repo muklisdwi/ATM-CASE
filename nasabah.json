@@ -1,0 +1,44 @@
+[
+    {
+        "idAccount":111122223333,
+        "pinAccount":123456,
+        "name":"Akun1",
+        "balance":"500000",
+        "history":[
+            {
+                "date":"2022-04-28 09:00:15",
+                "transaction":"Setor",
+                "amount":"500000",
+                "lastBalance":"500000"
+            }
+        ]
+    },
+    {
+        "idAccount":222233334444,
+        "pinAccount":123456,
+        "name":"Akun2",
+        "balance":"1000000",
+        "history":[
+            {
+                "date":"2022-04-28 09:00:15",
+                "transaction":"Setor",
+                "amount":"1000000",
+                "lastBalance":"1000000"
+            }
+        ]
+    },
+    {
+        "idAccount":123412341234,
+        "pinAccount":123456,
+        "name":"Akun3",
+        "balance":"1500000",
+        "history":[
+            {
+                "date":"2022-04-28 09:00:15",
+                "transaction":"Setor",
+                "amount":"1500000",
+                "lastBalance":"1500000"
+            }
+        ]
+    }
+]
