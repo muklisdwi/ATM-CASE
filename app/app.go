@@ -24,11 +24,11 @@ func OptionLogin(listAccount []*model.AccountBank) {
 	fmt.Printf("\nPilih Menu [1]/[0] : ")
 	option, _ := utils.InputScan()
 	switch option {
-	case "0":
+	case utils.CaseNol:
 		fmt.Println("\n>>>>>> Terima Kasih ! <<<<<<")
 		fmt.Println()
 		os.Exit(0)
-	case "1":
+	case utils.CaseSatu:
 		isAccount := service.LoginProccess(listAccount)
 		if isAccount != nil {
 			OptionAccount(isAccount, listAccount)
@@ -54,18 +54,18 @@ func OptionAccount(account *model.AccountBank, listAccount []*model.AccountBank)
 		fmt.Printf("\nPilih Menu [1]/[2]/[3]/[4]/[0] : ")
 		option, _ := utils.InputScan()
 		switch option {
-		case "0":
+		case utils.CaseNol:
 			fmt.Printf("\n")
 			fmt.Println(account.Name, "telah keluar")
 			fmt.Println("Terima Kasih")
 			isLogout = true
-		case "1":
+		case utils.CaseSatu:
 			service.TarikUang(account)
-		case "2":
+		case utils.CaseDua:
 			service.SetorUang(account)
-		case "3":
+		case utils.CaseTiga:
 			service.TransferUang(account, listAccount)
-		case "4":
+		case utils.CaseEmpat:
 			service.RiwayatTransaksi(account)
 		default:
 			fmt.Println("\n>>>>>> Pilihan Salah ! <<<<<<")

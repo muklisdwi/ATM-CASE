@@ -47,19 +47,19 @@ func TransferUang(accountPengirim *model.AccountBank, listAccount []*model.Accou
 
 	fmt.Printf("\n[1] Ya / [0] Tidak : ")
 	opsi, _ := utils.InputScan()
-	if opsi == "1" {
+	if opsi == utils.OpsiYa {
 		decimalNominal := decimal.NewFromInt(int64(intNominal)).Abs()
 		accountPengirim.Balance = accountPengirim.Balance.Sub(decimalNominal)
 		accountPengirim.History = append(accountPengirim.History, model.HistoryTransaction{
 			Date:        utils.TimeDateNow(),
-			Transaction: "Kirim",
+			Transaction: utils.Kirim,
 			Amount:      decimalNominal,
 			LastBalance: accountPengirim.Balance,
 		})
 		accountPenerima.Balance = accountPenerima.Balance.Add(decimalNominal)
 		accountPenerima.History = append(accountPenerima.History, model.HistoryTransaction{
 			Date:        utils.TimeDateNow(),
-			Transaction: "Terima",
+			Transaction: utils.Terima,
 			Amount:      decimalNominal,
 			LastBalance: accountPenerima.Balance,
 		})

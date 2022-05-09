@@ -8,9 +8,6 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-const limaPuluhRibu = 50000
-const angkaNol = 0
-
 // fungsi untuk proses setor uang
 func SetorUang(account *model.AccountBank) {
 	fmt.Println("\nSetor Uang :")
@@ -18,23 +15,23 @@ func SetorUang(account *model.AccountBank) {
 	fmt.Printf("\nMasukan jumlah nominal : ")
 
 	nominal, _ := utils.InputScan()
-	setor, err := decimal.NewFromString(nominal)
+	setorNominal, err := decimal.NewFromString(nominal)
 	if err != nil {
 		fmt.Println("\n>>>>>> Masukan Salah ! <<<<<<")
 		return
 	}
 
-	if setor.Mod(decimal.NewFromInt32(limaPuluhRibu)).Equal(decimal.NewFromInt32(angkaNol)) {
+	if setorNominal.Mod(decimal.NewFromInt32(utils.LimaPuluhRibu)).Equal(decimal.NewFromInt32(utils.AngkaNol)) {
 		fmt.Println("\nAnda akan melakukan setor uang", nominal)
 		fmt.Printf("\n[1] Ya / [0] Tidak : ")
 		opsi, _ := utils.InputScan()
-		if opsi == "1" {
-			result := setor.Add(account.Balance)
+		if opsi == utils.OpsiYa {
+			result := setorNominal.Add(account.Balance)
 			account.Balance = result
 			account.History = append(account.History, model.HistoryTransaction{
 				Date:        utils.TimeDateNow(),
-				Transaction: "Setor",
-				Amount:      setor,
+				Transaction: utils.Setor,
+				Amount:      setorNominal,
 				LastBalance: result,
 			})
 			fmt.Println("\n>>>>>> Setoran diproses <<<<<")
